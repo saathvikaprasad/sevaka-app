@@ -78,7 +78,7 @@ export const stallsData = [
 	{
 		id: 11,
 		name: "Aroma of South",
-		stall: "armoa-of-south",
+		stall: "aroma-of-south",
 		password: 7022,
 	},
 

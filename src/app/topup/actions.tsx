@@ -35,12 +35,12 @@ export async function addTransaction(
 			throw new Error("User has Checked Out");
 		}
 
-		if (!user[0].balance || (user[0].balance && user[0].balance < amount)) {
+		if (user[0].balance && user[0].balance < amount) {
 			throw new Error(
 				"Insufficient Balance, Current Balance: " + (user[0].balance || 0)
 			);
 		} else {
-			const newBalance = user[0].balance - amount;
+			const newBalance = (user[0].balance || 0) - amount;
 
 			await supabase
 				.from("balance")
