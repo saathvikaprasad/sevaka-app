@@ -20,6 +20,7 @@ const POS = () => {
 
 	// a modal to scan the qr code
 	const [scan, setScan] = useState(false);
+	console.log("fds");
 
 	const handleScan = async (data: any) => {
 		console.log(data);
