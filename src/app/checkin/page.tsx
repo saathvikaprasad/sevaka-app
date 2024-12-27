@@ -1,141 +1,94 @@
 "use client";
-import {
-	DoubleRightOutlined,
-	QrcodeOutlined,
-	SearchOutlined,
-} from "@ant-design/icons";
-import { Divider, Select } from "antd";
+import { useEffect, useState } from "react";
+import { getDataForSlot } from "./actions";
+import { LogoutOutlined } from "@ant-design/icons";
+import Assign from "./Assign";
+import { useRouter } from "next/navigation";
+
 const Page = () => {
+	const [slot, setSlot] = useState(1);
+	const [data, setData] = useState<any>(null);
+	const [mainDB, setMainDB] = useState<any>(null);
+	const [loading, setLoading] = useState(true);
+	const router = useRouter();
+
+	const getCookieValue = (cookieName: string) => {
+		const cookies = document.cookie.split("; ");
+		for (const cookie of cookies) {
+			const [name, value] = cookie.split("=");
+			if (name === cookieName) {
+				return decodeURIComponent(value);
+			}
+		}
+		return null;
+	};
+
+	useEffect(() => {
+		// aceess nextjs cookies in client side
+		const authToken = getCookieValue("authToken");
+		if (!authToken) {
+			// redirect to login page
+			router.push("checkin/login");
+		} else {
+			setLoading(true);
+			getDataForSlot(slot)
+				.then((res) => {
+					setMainDB(res);
+					const filteredInSlot = res.filter((d) => d.slots?.includes(slot));
+					const filteredNotInSlot = res.filter((d) => !d.slots?.includes(slot));
+					setData({ filteredInSlot, filteredNotInSlot });
+				})
+				.finally(() => {
+					setLoading(false);
+				});
+		}
+	}, []);
+
+	useEffect(() => {
+		if (mainDB) {
+			setLoading(true);
+			const filteredInSlot = mainDB.filter((d: any) => d.slots?.includes(slot));
+			const filteredNotInSlot = mainDB.filter(
+				(d: any) => !d.slots?.includes(slot)
+			);
+			setData({ filteredInSlot, filteredNotInSlot });
+			setLoading(false);
+		}
+	}, [slot]);
+
 	return (
 		<div className="bg-white flex flex-col gap-4 items-center justify-center w-full p-2">
-			<h3 className="text-2xl text-black font-bold">Check In Counters</h3>
-			<div className="flex flex-col w-full p-2 gap-6 justify-center">
-				<div className="flex gap-2 bg-slate-900 text-white rounded-lg justify-center p-4 items-center">
-					<QrcodeOutlined />
-					Scan QR Code
-				</div>
-				<Divider plain>OR</Divider>
-				<div className="flex flex-col gap-2">
-					<label className="text-black text-xl" htmlFor="chakra">
-						Chakra
-					</label>
-					<Select
-						showSearch
-						className="w-full"
-						size="large"
-						placeholder="Search to Select"
-						optionFilterProp="label"
-						filterSort={(optionA, optionB) =>
-							(optionA?.label ?? "")
-								.toLowerCase()
-								.localeCompare((optionB?.label ?? "").toLowerCase())
-						}
-						options={[
-							{
-								value: "1",
-								label: "Not Identified",
-							},
-							{
-								value: "2",
-								label: "Closed",
-							},
-							{
-								value: "3",
-								label: "Communicated",
-							},
-							{
-								value: "4",
-								label: "Identified",
-							},
-							{
-								value: "5",
-								label: "Resolved",
-							},
-							{
-								value: "6",
-								label: "Cancelled",
-							},
-						]}
-					/>
-				</div>
-				<div className="flex flex-col gap-2">
-					<label className="text-black text-xl" htmlFor="chakra">
-						Name
-					</label>
-					<Select
-						showSearch
-						className="w-full"
-						size="large"
-						placeholder="Search to Select"
-						optionFilterProp="label"
-						filterSort={(optionA, optionB) =>
-							(optionA?.label ?? "")
-								.toLowerCase()
-								.localeCompare((optionB?.label ?? "").toLowerCase())
-						}
-						options={[
-							{
-								value: "1",
-								label: "Not Identified",
-							},
-							{
-								value: "2",
-								label: "Closed",
-							},
-							{
-								value: "3",
-								label: "Communicated",
-							},
-							{
-								value: "4",
-								label: "Identified",
-							},
-							{
-								value: "5",
-								label: "Resolved",
-							},
-							{
-								value: "6",
-								label: "Cancelled",
-							},
-						]}
-					/>
-				</div>
-				<div className="flex gap-2 bg-slate-900 text-white rounded-lg justify-center p-2 items-center">
-					<DoubleRightOutlined />
-					Proceed
+			<div className="flex w-full gap-2 items-center justify-center">
+				<select
+					onChange={(e) => setSlot(parseInt(e.target.value))}
+					className="w-1/2 p-2 border border-gray-300 rounded-lg"
+					value={slot}
+				>
+					<option value={1}>Slot 1</option>
+					<option value={2}>Slot 2</option>
+					<option value={3}>Slot 3</option>
+				</select>
+				<div className="flex gap-2 bg-red-800 text-white rounded-lg justify-center p-2 items-center">
+					<LogoutOutlined />
+					Logout
 				</div>
 			</div>
-			<Divider plain>OR</Divider>
-			<div className="w-full p-2 flex flex-col gap-2">
-				<label className="text-black text-xl" htmlFor="mobile">
-					Mobile
-				</label>
-				<input
-					type="tel"
-					className="w-full p-2 border border-gray-300 rounded-lg"
-					placeholder="Mobile Number"
+			{loading ? (
+				<div className="flex justify-center items-center w-full h-full">
+					<div
+						className="spinner-border animate-spin inline-block w-16 h-16 border-8 border-t-8 border-t-blue-500 rounded-full"
+						role="status"
+					>
+						<span className="hidden">Loading...</span>
+					</div>
+				</div>
+			) : (
+				<Assign
+					filterDataInSlot={data?.filteredInSlot || []}
+					filterDataNotInSlot={data?.filteredNotInSlot || []}
+					slot={slot}
 				/>
-				<div className="flex gap-2 bg-slate-900 text-white rounded-lg justify-center p-2 items-center">
-					<SearchOutlined />
-					Search
-				</div>
-			</div>
-			<Divider plain>OR</Divider>
-			<div className="w-full p-2 flex flex-col gap-2">
-				<label className="text-black text-xl" htmlFor="email">
-					Email
-				</label>
-				<input
-					type="email"
-					className="w-full p-2 border border-gray-300 rounded-lg"
-					placeholder="Email Address"
-				/>
-				<div className="flex gap-2 bg-slate-900 text-white rounded-lg justify-center p-2 items-center">
-					<SearchOutlined />
-					Search
-				</div>
-			</div>
+			)}
 		</div>
 	);
 };
