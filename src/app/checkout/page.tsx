@@ -4,7 +4,6 @@ import { stallsData } from "./login/_utils/stalls";
 import { notFound, redirect } from "next/navigation";
 
 import { cookies } from "next/headers";
-import { getTransactions, getVendorDetails } from "./actions";
 
 export default async function Page() {
 	const cookieStore = await cookies();
