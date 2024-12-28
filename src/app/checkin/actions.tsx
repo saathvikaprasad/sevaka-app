@@ -119,7 +119,7 @@ export async function assignWristband(
 	// status 1 = checked in
 	// status 2 = checked out
 
-	const modifiedId = `${slot}0${user.id}`;
+	// const modifiedId = `${slot}0${user.id}`;
 
 	let credit = calcCredit(user, slot);
 
@@ -128,7 +128,7 @@ export async function assignWristband(
 			.insert(users)
 			.values({
 				qrcode: code,
-				userId: parseInt(modifiedId),
+				userId: user.id,
 				slotId: slot,
 				sevakaType: user.sevakaType || "A",
 				balance: credit,

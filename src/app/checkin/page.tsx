@@ -6,7 +6,7 @@ import Assign from "./Assign";
 import { useRouter } from "next/navigation";
 
 const Page = () => {
-	const [slot, setSlot] = useState(1);
+	const [slot, setSlot] = useState(3);
 	const [data, setData] = useState<any>(null);
 	const [mainDB, setMainDB] = useState<any>(null);
 	const [loading, setLoading] = useState(true);

@@ -424,7 +424,7 @@ const Assign: FC<props> = ({ filterDataInSlot, filterDataNotInSlot, slot }) => {
 									<p className="text-green-700">Free Entry</p>
 								) : (
 									<p className="text-red-500">
-										Registered for slot {user.slots}
+										Registered for slot {user.slots.join(", ")}
 									</p>
 								)}
 							</div>
