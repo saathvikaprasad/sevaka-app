@@ -13,6 +13,9 @@ export async function addTransaction(
 	slug: string
 ) {
 	try {
+		throw new Error(
+			"Stalls and topup Counters closed during Visiting Vaishnava Kirtan! We will reopen at 4:20 PM"
+		);
 		const user = await db
 			.select({
 				id: users.id,
