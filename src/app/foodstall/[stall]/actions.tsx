@@ -13,114 +13,114 @@ export async function addTransaction(
 	slug: string
 ) {
 	try {
-		throw new Error(
-			"Stalls and topup Counters closed during Visiting Vaishnava Kirtan! We will reopen at 4:20 PM"
-		);
-		// const user = await db
-		// 	.select({
-		// 		id: users.id,
-		// 		userId: users.userId,
-		// 		sevakaType: users.sevakaType,
-		// 		balance: users.balance,
-		// 		status: users.status,
-		// 	})
-		// 	.from(users)
-		// 	// .fullJoin(registeredUsers, )
-		// 	.where(eq(users.qrcode, qrCode));
+		// throw new Error(
+		// 	"Stalls and topup Counters closed during Visiting Vaishnava Kirtan! We will reopen at 4:20 PM"
+		// );
+		const user = await db
+			.select({
+				id: users.id,
+				userId: users.userId,
+				sevakaType: users.sevakaType,
+				balance: users.balance,
+				status: users.status,
+			})
+			.from(users)
+			// .fullJoin(registeredUsers, )
+			.where(eq(users.qrcode, qrCode));
 
-		// console.log(user);
+		console.log(user);
 
-		// if (user.length === 0) {
-		// 	throw new Error("User not found");
-		// }
+		if (user.length === 0) {
+			throw new Error("User not found");
+		}
 
-		// if (user[0].status === 2) {
-		// 	throw new Error("User has Checked Out");
-		// }
+		if (user[0].status === 2) {
+			throw new Error("User has Checked Out");
+		}
 
-		// if (!user[0].balance || (user[0].balance && user[0].balance < amount)) {
-		// 	throw new Error(
-		// 		"Insufficient Balance, Current Balance: " + (user[0].balance || 0)
-		// 	);
-		// } else {
-		// 	const newBalance = user[0].balance - amount;
-		// 	await supabase
-		// 		.from("balance")
-		// 		.update([
-		// 			{
-		// 				qrcode: qrCode,
-		// 				balance: newBalance,
-		// 			},
-		// 		])
-		// 		.eq("qrcode", qrCode);
+		if (!user[0].balance || (user[0].balance && user[0].balance < amount)) {
+			throw new Error(
+				"Insufficient Balance, Current Balance: " + (user[0].balance || 0)
+			);
+		} else {
+			const newBalance = user[0].balance - amount;
+			await supabase
+				.from("balance")
+				.update([
+					{
+						qrcode: qrCode,
+						balance: newBalance,
+					},
+				])
+				.eq("qrcode", qrCode);
 
-		// 	console.log(newBalance);
+			console.log(newBalance);
 
-		// 	const vendor = await db
-		// 		.select({
-		// 			id: vendors.id,
-		// 			balance: vendors.balance,
-		// 			onhold: vendors.onhold,
-		// 			qty2: vendors.qty2,
-		// 			qty5: vendors.qty5,
-		// 		})
-		// 		.from(vendors)
-		// 		.where(eq(vendors.slug, slug));
-		// 	console.log(vendor);
+			const vendor = await db
+				.select({
+					id: vendors.id,
+					balance: vendors.balance,
+					onhold: vendors.onhold,
+					qty2: vendors.qty2,
+					qty5: vendors.qty5,
+				})
+				.from(vendors)
+				.where(eq(vendors.slug, slug));
+			console.log(vendor);
 
-		// 	let response_result = {};
-		// 	const newQty2 = (vendor[0].qty2 || 0) + qty2;
-		// 	const newQty5 = (vendor[0].qty5 || 0) + qty5;
+			let response_result = {};
+			const newQty2 = (vendor[0].qty2 || 0) + qty2;
+			const newQty5 = (vendor[0].qty5 || 0) + qty5;
 
-		// 	if (user[0].sevakaType === "S" || user[0].sevakaType === "KS") {
-		// 		const newOnhold = (vendor[0].onhold || 0) + amount;
+			if (user[0].sevakaType === "S" || user[0].sevakaType === "KS") {
+				const newOnhold = (vendor[0].onhold || 0) + amount;
 
-		// 		await db
-		// 			.update(vendors)
-		// 			.set({ onhold: newOnhold, qty2: newQty2, qty5: newQty5 })
-		// 			.where(eq(vendors.slug, slug));
-		// 		console.log(newOnhold);
-		// 		response_result = {
-		// 			onHold: newOnhold,
-		// 			balance: vendor[0].balance,
-		// 		};
-		// 	} else {
-		// 		const newVendorBalance = (vendor[0].balance || 0) + amount;
-		// 		await db
-		// 			.update(vendors)
-		// 			.set({ balance: newVendorBalance, qty2: newQty2, qty5: newQty5 })
-		// 			.where(eq(vendors.slug, slug));
-		// 		console.log(newVendorBalance);
-		// 		response_result = {
-		// 			onHold: vendor[0].onhold,
-		// 			balance: newVendorBalance,
-		// 		};
-		// 	}
+				await db
+					.update(vendors)
+					.set({ onhold: newOnhold, qty2: newQty2, qty5: newQty5 })
+					.where(eq(vendors.slug, slug));
+				console.log(newOnhold);
+				response_result = {
+					onHold: newOnhold,
+					balance: vendor[0].balance,
+				};
+			} else {
+				const newVendorBalance = (vendor[0].balance || 0) + amount;
+				await db
+					.update(vendors)
+					.set({ balance: newVendorBalance, qty2: newQty2, qty5: newQty5 })
+					.where(eq(vendors.slug, slug));
+				console.log(newVendorBalance);
+				response_result = {
+					onHold: vendor[0].onhold,
+					balance: newVendorBalance,
+				};
+			}
 
-		// 	const transaction = await db
-		// 		.insert(transactions)
-		// 		.values({
-		// 			userId: user[0].id,
-		// 			vendorId: vendor[0].id,
-		// 			amount: amount,
-		// 			status: "success",
-		// 			type: type,
-		// 			qty2: qty2,
-		// 			qty5: qty5,
-		// 		})
-		// 		.returning({ id: transactions.id });
-		// 	console.log(transaction);
+			const transaction = await db
+				.insert(transactions)
+				.values({
+					userId: user[0].id,
+					vendorId: vendor[0].id,
+					amount: amount,
+					status: "success",
+					type: type,
+					qty2: qty2,
+					qty5: qty5,
+				})
+				.returning({ id: transactions.id });
+			console.log(transaction);
 
-		// 	await db
-		// 		.update(users)
-		// 		.set({ balance: newBalance, lastTransaction: transaction[0].id })
-		// 		.where(eq(users.qrcode, qrCode));
+			await db
+				.update(users)
+				.set({ balance: newBalance, lastTransaction: transaction[0].id })
+				.where(eq(users.qrcode, qrCode));
 
-		// 	return {
-		// 		status: "success",
-		// 		data: { transaction_id: transaction[0].id, response_result },
-		// 	};
-		// }
+			return {
+				status: "success",
+				data: { transaction_id: transaction[0].id, response_result },
+			};
+		}
 	} catch (error: any) {
 		return { status: "error", data: error.message };
 	}
